@@ -6,14 +6,14 @@
     <link rel="stylesheet" href="omnizoom.css">
   </head>
   <body>
-    <div class="zoom-container" style="width: 50%">
+    <div class="zoom-container" style="width: 50%; margin: 10px">
       <video id="video" style="width: 100%" class="zoom" preload="auto" controls src="./data/count.mp4">
       </video>
     </div>
-    <div class="zoom-container" style="width: 50%">
+    <div class="zoom-container" style="width: 50%; margin: 10px">
       <img id="img" class="zoom" style="width: 100%" src="./data/IMG-0840.JPG">
     </div>
-    <div id="cntr" style="width: 50%" class="zoom-container">
+    <div id="cntr" style="width: 50%; margin: 10px" class="zoom-container">
       <div id="chld" style="width: 100%" class="zoom">
         <h1>The Good</h1>
         <h2>The Bad</h2>
@@ -28,15 +28,18 @@
 
     const zmy1 = new omnizoom.Zoomer();
     zmy1.addElem(video)
-        .addOnScroll();
+        .addOnScroll()
+        .addOnDrag();
 
     const zmy2 = new omnizoom.Zoomer();
     zmy2.addElem(chld)
-        .addOnScroll();
+        .addOnScroll()
+        .addOnDrag();
 
     const zmy3 = new omnizoom.Zoomer();
     zmy3.addElem(img)
-        .addOnScroll();
+        .addOnScroll()
+        .addOnDrag();
     </script>
   </body>
 </html>
