@@ -4,7 +4,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'zoomy.js',
+    filename: 'zoomy.min.js',
     library: 'zoomy',
     libraryTarget: 'umd'
   }

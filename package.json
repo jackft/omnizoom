@@ -7,13 +7,17 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack"
   },
-  "main": "dist/zoomy.js",
+  "main": "dist/zoomy.min.js",
   "module": "src/index.js",
   "keywords": [
     "zoom",
     "annotation",
     "video"
   ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
   "author": "Jack Terwilliger <jack.f.terwilliger@gmail.com> (http://jackterwilliger.com)",
   "license": "MIT",
   "devDependencies": {

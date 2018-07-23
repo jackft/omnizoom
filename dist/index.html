@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Video 4 HCAI</title>
+    <link rel="stylesheet" href="zoomy.css">
+  </head>
+  <body>
+    <div class="zoom-container" style="width: 50%">
+      <video id="video" style="width: 100%" class="zoom" preload="auto" controls src="./data/count.mp4">
+      </video>
+    </div>
+    <div class="zoom-container" style="width: 50%">
+      <img id="img" class="zoom" style="width: 100%" src="./data/IMG-0840.JPG">
+    </div>
+    <div id="cntr" style="width: 50%" class="zoom-container">
+      <div id="chld" style="width: 100%" class="zoom">
+        <h1>The Good</h1>
+        <h2>The Bad</h2>
+        <h3>The Zoomies</h3>
+      </div>
+    </div>
+    <script src="zoomy.min.js"></script>
+    <script>
+    const video = document.getElementById("video");
+    const chld = document.getElementById("chld");
+    const img = document.getElementById("img");
+
+    const zmy1 = new zoomy.Zoomy();
+    zmy1.addElem(video)
+        .addOnScroll();
+
+    const zmy2 = new zoomy.Zoomy();
+    zmy2.addElem(chld)
+        .addOnScroll();
+
+    const zmy3 = new zoomy.Zoomy();
+    zmy3.addElem(img)
+        .addOnScroll();
+    </script>
+  </body>
+</html>
