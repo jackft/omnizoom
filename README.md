@@ -1,7 +1,7 @@
 # Omnizoom
 With some dumb js, you can scroll into anything!
 
-Sroll into a video!
+Scroll into a video!
 
 ![Zoom into a video](http://jackterwilliger.com/omnizoom-video/)
 
@@ -9,7 +9,7 @@ Scroll into an image!
 
 ![Zoom into a video](http://jackterwilliger.com/omnizoom-image/)
 
-Sroll into a container!
+Scroll into a container!
 
 ![Zoom into a video](http://jackterwilliger.com/omnizoom-div/)
 
