@@ -1,0 +1,1 @@
+export {Zoomy} from './zoomy';
