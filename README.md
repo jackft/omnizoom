@@ -16,15 +16,23 @@ Scroll into a container!
 I'm using this to build annotation tools for computer vision. Use it for anything.
 
 # Installation
-Put these two lines in your header
-```html
-<link rel="stylesheet" href="omnizoom.css">
-<script type="text/javascript" src="omnizoom.min.js"></script>  
+```
+git clone https://github.com/jackft/omnizoom
 ```
 or:
 ```
 npm install --save omnizoom
 ```
+
+then include some files in your HTML
+Put these two lines in your header
+```html
+<link rel="stylesheet" href="omnizoom.css">
+<script type="text/javascript" src="omnizoom.min.js"></script>  
+```
+
+If you used git, they'll be in ```omnizoom/dist```
+If you used npm, they'll be in ```node_modules/omnizoom/dist```
 
 # Directions
 1. make sure you've included the code (above)
