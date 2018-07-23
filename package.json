@@ -1,13 +1,13 @@
 {
-  "name": "zoomy",
+  "name": "omnizoom",
   "version": "1.0.0",
   "description": "A stupid js class to zoom into any dom element (using the scroll wheel).",
-  "private": true,
+  "private": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack"
   },
-  "main": "dist/zoomy.min.js",
+  "main": "dist/omnizoom.min.js",
   "module": "src/index.js",
   "keywords": [
     "zoom",

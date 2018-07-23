@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8"/>
     <title>Video 4 HCAI</title>
-    <link rel="stylesheet" href="zoomy.css">
+    <link rel="stylesheet" href="omnizoom.css">
   </head>
   <body>
     <div class="zoom-container" style="width: 50%">
@@ -20,21 +20,21 @@
         <h3>The Zoomies</h3>
       </div>
     </div>
-    <script src="zoomy.min.js"></script>
+    <script src="omnizoom.min.js"></script>
     <script>
     const video = document.getElementById("video");
     const chld = document.getElementById("chld");
     const img = document.getElementById("img");
 
-    const zmy1 = new zoomy.Zoomy();
+    const zmy1 = new omnizoom.Zoomer();
     zmy1.addElem(video)
         .addOnScroll();
 
-    const zmy2 = new zoomy.Zoomy();
+    const zmy2 = new omnizoom.Zoomer();
     zmy2.addElem(chld)
         .addOnScroll();
 
-    const zmy3 = new zoomy.Zoomy();
+    const zmy3 = new omnizoom.Zoomer();
     zmy3.addElem(img)
         .addOnScroll();
     </script>

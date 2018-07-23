@@ -1,4 +1,4 @@
-export class Zoomy {
+export class Zoomer {
     constructor(opts) {
         this.elemObjs = [];
         this.zoomCoef = (opts !== undefined && opts.zoomCoef !== undefined) 

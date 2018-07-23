@@ -1,1 +1,1 @@
-export {Zoomy} from './zoomy';
+export {Zoomer} from './zoomer';
