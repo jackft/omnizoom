@@ -3,6 +3,7 @@ A dumb js class for zooming into points of dom elements: videos, images, divs, e
 Videos and images can be either aliased or anti-aliased.
 
 # Usage
+Possible HTML
 ```html
 <div class="zoom-container container" width="50%">
   <video id="zoomable-video" class="zoom" preload="auto" controls src="your-video.mp4"></video>
@@ -16,7 +17,7 @@ Videos and images can be either aliased or anti-aliased.
   </div>
 </div>
 ```
-
+How to make each element zoomable with the scroll wheel
 ```javascript
 // add zoom functionality to the video
 const zoomy1 = new zoomy.Zoomy()
