@@ -1,6 +1,13 @@
-# Zoomy
-A dumb js class for zooming into points of dom elements: videos, images, divs, etc.
-Videos and images can be either aliased or anti-aliased.
+# Omnizoom
+With some dumb js, you can scroll into anything!
+Sroll into a video!
+![Zoom into a video](http://jackterwilliger.com/omnizoom-video/)
+Scroll into an image!
+![Zoom into a video](http://jackterwilliger.com/omnizoom-image/)
+Sroll into a container!
+![Zoom into a video](http://jackterwilliger.com/omnizoom-div/)
+
+I'm using this to build annotation tools for computer vision. Use it for anything.
 
 # Usage
 Possible HTML elements:
