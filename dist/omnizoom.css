@@ -19,3 +19,12 @@
     transform-origin: 0 0;
     overflow: hidden;
 }
+
+
+/* cue users that they are in grab mode */
+.grabbed {
+    cursor: grabbing;
+    cursor: hand;
+    cursor: -webkit-grab;
+    cursor: grab;
+}

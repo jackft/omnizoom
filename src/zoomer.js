@@ -1,7 +1,7 @@
 export class Zoomer {
     constructor(opts) {
         this.elems = [];
-        this.zoomCoef = (opts !== undefined && opts.zoomCoef !== undefined) 
+        this.zoomCoef = (opts !== undefined && opts.zoomCoef !== undefined)
                       ? opts.zoomCoef
                       : 1.05;
         // zooming
@@ -57,10 +57,10 @@ export class Zoomer {
         // new zoom coordinates
         const xNewZ = xOldZ * zNew;
         const yNewZ = yOldZ * zNew;
-        // update 
+        // update
         let xNew = xMouse - xNewZ;
         let yNew = yMouse - yNewZ;
-        // keep in bounds 
+        // keep in bounds
         [xNew, yNew] = this.keepInBounds(elem, xNew, yNew, zNew);
         // make sure scale is to the right of traslate3d
         return [xNew, yNew, zNew];
@@ -172,15 +172,14 @@ export class Zoomer {
             });
             // Change the cursor to a grabby hand
             // Change it back when no longer panning
-            const defaultCursor = elem.style.cursor;
             document.addEventListener("keydown", (event) => {
                 if (event.key === "Control") {
-                    elem.style.cursor = 'grabbing';
+                    elem.classList.add("grabbed");
                 }
             });
             document.addEventListener("keyup", (event) => {
                 if (event.key === "Control") {
-                    elem.style.cursor = defaultCursor;
+                    elem.classList.remove("grabbed");
                 }
             });
         });
