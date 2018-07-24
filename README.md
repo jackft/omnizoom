@@ -13,7 +13,7 @@ Pan/Zoom into a container!
 
 ![Zoom into a video](http://jackterwilliger.com/wp-content/uploads/2018/07/omnizoom-div.gif)
 
-I'm using this to build annotation tools for computer vision. Use it for anything.
+I'm using this to build annotation tools for computer vision datasets and to study the roll spatial context plays in perception. Use it for anything.
 
 # Installation
 ```
