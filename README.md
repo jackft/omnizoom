@@ -1,17 +1,17 @@
 # Omnizoom
 With some dumb js, you can pan or scroll into anything! Demo: http://jackterwilliger.com/tools-omnizoom/
 
-Pan/scroll into a video!
+Pan/Zoom into a video!
 
-![Zoom into a video](http://jackterwilliger.com/omnizoom-video/)
+![Zoom into a video](http://jackterwilliger.com/wp-content/uploads/2018/07/omnizoom-video.gif)
 
-Pan/scroll into an image!
+Pan/Zoom into an image!
 
-![Zoom into a video](http://jackterwilliger.com/omnizoom-image/)
+![Zoom into an image](http://jackterwilliger.com/wp-content/uploads/2018/07/omnizoom-image.gif)
 
-Pan/scroll into a container!
+Pan/Zoom into a container!
 
-![Zoom into a video](http://jackterwilliger.com/omnizoom-div/)
+![Zoom into a video](http://jackterwilliger.com/wp-content/uploads/2018/07/omnizoom-div.gif)
 
 I'm using this to build annotation tools for computer vision. Use it for anything.
 
@@ -61,12 +61,13 @@ How to make each element zoomable with the scroll wheel:
 const zoomy1 = new omnizoom.Zoomer()
                            .addElem(document.getElementById("zoomable-video"))
                            .addOnScroll();
-// add zoom functionality to the img
+// add pan functionality to the img
 const zoomy2 = new omnizoom.Zoomer()
                            .addElem(document.getElementById("zoomable-img"))
-                           .addOnScroll();
-// add zoom functionality to the div
+                           .addOnDrag();
+// add zoom and pan functionality to the div
 const zoomy3 = new omnizoom.Zoomer()
                            .addElem(document.getElementById("zoomable-div"))
-                           .addOnScroll();
+                           .addOnScroll()
+                           .addOnDrag();
 ```
