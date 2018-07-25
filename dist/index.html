@@ -7,7 +7,7 @@
   </head>
   <body>
     <div class="zoom-container" style="width: 50%; margin: 10px">
-      <video id="video" style="width: 100%" class="zoom" preload="auto" controls src="./data/count.mp4">
+      <video id="video" style="width: 100%" class="zoom" preload="auto" src="./data/count.mp4">
       </video>
     </div>
     <div class="zoom-container" style="width: 50%; margin: 10px">
@@ -40,6 +40,20 @@
     zmy3.addElem(img)
         .addOnScroll()
         .addOnDrag();
+
+    let playing = false;
+    document.addEventListener("keypress", (event) => {
+      if (event.key === " ") {
+        event.preventDefault();
+        if (playing) {
+          video.pause();
+          playing = false;
+        } else {
+          video.play();
+          playing = true;
+        }
+      }
+    });
     </script>
   </body>
 </html>

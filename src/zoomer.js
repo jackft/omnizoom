@@ -1,100 +1,89 @@
 export class Zoomer {
     constructor(opts) {
-        this.elemObjs = [];
+        this.elems = [];
         this.zoomCoef = (opts !== undefined && opts.zoomCoef !== undefined) 
                       ? opts.zoomCoef
-                      : 1.1;
+                      : 1.05;
         // zooming
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
+        this.zFactor = 0;
         // panning
         this.xDrag = undefined;
         this.yDrag = undefined;
-        this.dragging = false;
+        this.panning = false;
+        // transformation matrix...well the trace of it
+        this.transformation = [0,0,this.zoomCoef**this.zFactor];
         return this;
     }
 
     addElem(elem) {
-        const elemObj = {e: elem, w: elem.clientWidth, h: elem.clientHeight};
-        this.elemObjs.push(elemObj);
+        this.elems.push(elem);
         return this;
     }
 
-    zoom(x, y, zoomIn) {
-        this.elemObjs.forEach(elemObj => {
-            this.zoomHelper(elemObj, x, y, zoomIn);
-        });
+    zoom(elem, x, y, zoomIn) {
+        this.transformation = this.zoomHelper(elem, x, y, zoomIn)
+        this.setTransformation(...this.transformation);
         return this;
     }
 
-    zoomHelper(elemObj, x, y, zoomIn) {
-        const zOld = this.zoomCoef**this.z;
-        let z = undefined;
+    zoomHelper(elem, x, y, zoomIn) {
+        const [xOld, yOld, zOld] = this.transformation;
+        // figure our if we are zooming in, out, or not at all
         switch (zoomIn) {
             case 0:
-                z = this.z;
+                return this.transformation;
                 break;
             case 1:
-                z = this.z + 1;
+                this.zFactor += 1;
                 break;
             case -1:
-                z = this.z - 1;
+                this.zFactor -= 1;
                 break;
             default:
                 console.log("something went wrong setting the zoom level");
                 break;
         }
-        const zNew = this.zoomCoef**z;
-
+        // get new zoom level
+        const zNew = this.zoomCoef**this.zFactor;
+        // don't zoom out beyond original size
         if (zNew < 1) {
-            return this;
+            return this.transformation;
         }
-        
         // mouse coordinates
-        const [xMouse, yMouse] = this.clientPosToRelPos(elemObj.e, x, y);
-
+        const [xMouse, yMouse] = this.clientPosToRelPos(elem, x, y);
         // old zoom coordinates
-        const xOld = (xMouse - this.x) / zOld;
-        const yOld = (yMouse - this.y) / zOld;
-
+        const xOldZ = (xMouse - xOld) / zOld;
+        const yOldZ = (yMouse - yOld) / zOld;
         // new zoom coordinates
-        const xNew = xOld * zNew;
-        const yNew = yOld * zNew;
-
+        const xNewZ = xOldZ * zNew;
+        const yNewZ = yOldZ * zNew;
         // update 
-        this.x = xMouse - xNew;
-        this.y = yMouse - yNew;
-        this.z = z;
-
+        let xNew = xMouse - xNewZ;
+        let yNew = yMouse - yNewZ;
         // keep in bounds 
-        [this.x, this.y] = this.keepInBounds(elemObj, this.x, this.y, this.zoomCoef**(z));
-
+        [xNew, yNew] = this.keepInBounds(elem, xNew, yNew, zNew);
         // make sure scale is to the right of traslate3d
-        this.setTransformationHelper(elemObj, this.x, this.y, zNew);        
+        return [xNew, yNew, zNew];
     }
 
     clientPosToRelPos(elem, x, y) {
         // scroll offset
         const xScroll = window.pageXOffset || document.documentElement.scrollLeft;
         const yScroll = window.pageYOffset || document.documentElement.scrollTop;
-
         // container offset
         const xOffset = elem.offsetLeft;
         const yOffset = elem.offsetTop;
-
         // relative coordinates
         const xMouse = x - xOffset + xScroll;
         const yMouse = y - yOffset + yScroll;
         return [xMouse, yMouse];
     }
 
-    keepInBounds(elemObj, x, y, z) {
+    keepInBounds(elem, x, y, z) {
         // original size of the element
         // this also defines the right, bottom boundary
-        const w = elemObj.w;
-        const h = elemObj.h;
-
+        const w = elem.clientWidth;
+        const h = elem.clientHeight;
         // there should be no void space left of the element
         // there should be no void space right of the element
         if (x > 0) {
@@ -112,38 +101,42 @@ export class Zoomer {
         return [x, y];
     }
 
-    pan(x, y) {
-        this.elemObjs.forEach(elemObj => {
-            this.panHelper(elemObj, x, y);
-        });
+    pan(elem, x, y) {
+        this.transformation = this.panHelper(elem, x, y)
+        this.setTransformation(...this.transformation);
         return this;
     }
 
-    panHelper(elemObj, x, y) {
-        const [xMouse, yMouse] = this.clientPosToRelPos(elemObj.e, x, y);
-        let xx = undefined;
-        let yy = undefined;
-        if (this.xDrag !== undefined && this.yDrag !== undefined) {
-            xx = xMouse - this.xDrag;
-            yy = yMouse - this.yDrag;
-
-           const z = this.zoomCoef**(this.z);
-
-           [this.x, this.y] = this.keepInBounds(elemObj, this.x + xx, this.y + yy, z);
-           this.setTransformationHelper(elemObj, this.x, this.y, z);
+    panHelper(elem, x, y) {
+        // return if no previous value
+        const [xMouse, yMouse] = this.clientPosToRelPos(elem, x, y);
+        if (!this.panning || this.xDrag == undefined || this.yDrag == undefined) {
+            this.xDrag = xMouse;
+            this.yDrag = yMouse;
+            return this.transformation;
         }
+        // get old values
+        const [xOld, yOld, zOld] = this.transformation;
+        // get the difference between the current and last drag
+        const xDelta = xMouse - this.xDrag;
+        const yDelta = yMouse - this.yDrag;
+        // get new translation values
+        let xNew = xOld + xDelta;
+        let yNew = yOld + yDelta;
+        [xNew, yNew] = this.keepInBounds(elem, xNew, yNew, zOld);
         this.xDrag = xMouse;
         this.yDrag = yMouse;
+        return [xNew, yNew, zOld];
     }
 
     addOnScroll(callback) {
-        this.elemObjs.forEach(elemObj => {
-            elemObj.e.onwheel = (event) => {
+        this.elems.forEach(elem => {
+            elem.onwheel = (event) => {
                 event.preventDefault();
                 const x = event.clientX;
                 const y = event.clientY;
                 const zoomIn = (event.deltaY < 0) ? 1 : -1;
-                this.zoom(x, y, zoomIn);
+                this.zoom(elem, x, y, zoomIn);
             }
             if (callback !== undefined) {
                 callback(this.x, this.y, this.zoomCoef**this.z);
@@ -153,56 +146,68 @@ export class Zoomer {
     }
 
     addOnDrag(callback) {
-        //
-        this.elemObjs.forEach(elemObj => {
-            switch (elemObj.e.tagName) {
-                case "IMG":
-                    elemObj.e.ondrag = (event) => {
-                        const x = event.clientX;
-                        const y = event.clientY;
-                        if (x != 0 && y != 0) {
-                            this.pan(x, y);
-                        }
-                        if (callback !== undefined) {
-                            callback(this.x, this.y, this.zoomCoef**this.z);
-                        }
-                    }
-                    elemObj.e.onmouseup = (event) => {
-                        this.xDrag = undefined;
-                        this.yDrag = undefined;
-                    }
-                    elemObj.e.ondragend = (event) => {
-                        this.xDrag = undefined;
-                        this.yDrag = undefined;
-                    }
-                    elemObj.e.ondragleave = (event) => {
-                        this.xDrag = undefined;
-                        this.yDrag = undefined;
-                    }
-                    break;
-                default:
-                    elemObj.e.onmousemove = (event) => {
-                        const x = event.clientX;
-                        const y = event.clientY;
-                        if (x != 0 && y != 0 && this.dragging) {
-                            this.pan(x, y);
-                        }
-                        if (callback !== undefined) {
-                            callback(this.x, this.y, this.zoomCoef**this.z);
-                        }
-                    }
-                    elemObj.e.onmousedown = (event) => {
-                        this.dragging = true;
-                    }
-                    elemObj.e.onmouseup = (event) => {
-                        this.xDrag = undefined;
-                        this.yDrag = undefined;
-                        this.dragging = false;
-                    }
-                    break;
+        this.elems.forEach(elem => {
+            // when the mouse goes down, start the pan
+            elem.onmousedown = (event) => {
+                if (event.ctrlKey) {
+                    event.preventDefault();
+                    this.panning = true;
+                }
             }
+            // when dragged, pan
+            elem.onmousemove = (event) => {
+                this.onPan(elem, event, callback);
+            }
+            window.addEventListener("mousemove", (event) => {
+                this.onPan(elem, event, callback);
+            });
+            // when mouseup, reset
+            elem.onmouseup = (event) => {
+                this.offPan(elem, event);
+            }
+            window.addEventListener("mouseup", (event) => {
+                this.panning = false;
+                this.xDrag = undefined;
+                this.yDrag = undefined;
+            });
+            // Change the cursor to a grabby hand
+            // Change it back when no longer panning
+            const defaultCursor = elem.style.cursor;
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Control") {
+                    elem.style.cursor = 'grabbing';
+                }
+            });
+            document.addEventListener("keyup", (event) => {
+                if (event.key === "Control") {
+                    elem.style.cursor = defaultCursor;
+                }
+            });
         });
         return this;
+    }
+
+    onPan(elem, event, callback) {
+        if (event.ctrlKey && this.panning) {
+            const x = event.clientX;
+            const y = event.clientY;
+            if (x != 0 && y != 0 && this.panning) {
+                this.pan(elem, x, y);
+            }
+            if (callback !== undefined) {
+                callback(this.x, this.y, this.zoomCoef**this.z);
+            }
+        } else {
+            this.xDrag = undefined;
+            this.yDrag = undefined;
+            this.panning = false;
+        }
+    }
+
+    offPan(elem, event) {
+        this.xDrag = undefined;
+        this.yDrag = undefined;
+        this.panning = false;
     }
 
     getTransformation() {
@@ -210,15 +215,15 @@ export class Zoomer {
     }
 
     setTransformation(x, y, z) {
-        this.elemObjs.forEach(elemObj => {
-            this.setTransformationHelper(elemObj, x, y, z);
+        this.elems.forEach(elem => {
+            this.setTransformationHelper(elem, x, y, z);
         })
         return this;
     }
 
-    setTransformationHelper(elemObj, x, y, z) {
+    setTransformationHelper(elem, x, y, z) {
         const transformation = `translate3D(${x}px,${y}px,0) scale(${z})`;
-        elemObj.e.style.setProperty('transform', transformation);
+        elem.style.setProperty('transform', transformation);
         return this;
     }
 }
