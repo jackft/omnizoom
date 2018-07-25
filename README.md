@@ -1,5 +1,5 @@
 # Omnizoom
-With some dumb js, you can scroll into anything!
+With some dumb js, you can scroll into anything! Demo: http://jackterwilliger.com/tools-omnizoom/
 
 Scroll into a video!
 
