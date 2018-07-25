@@ -1,15 +1,15 @@
 # Omnizoom
-With some dumb js, you can scroll into anything! Demo: http://jackterwilliger.com/tools-omnizoom/
+With some dumb js, you can pan or scroll into anything! Demo: http://jackterwilliger.com/tools-omnizoom/
 
-Scroll into a video!
+Pan/scroll into a video!
 
 ![Zoom into a video](http://jackterwilliger.com/omnizoom-video/)
 
-Scroll into an image!
+Pan/scroll into an image!
 
 ![Zoom into a video](http://jackterwilliger.com/omnizoom-image/)
 
-Scroll into a container!
+Pan/scroll into a container!
 
 ![Zoom into a video](http://jackterwilliger.com/omnizoom-div/)
 
