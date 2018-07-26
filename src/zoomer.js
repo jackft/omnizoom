@@ -1,21 +1,60 @@
 export class Zoomer {
     constructor(opts) {
         this.elems = [];
-        this.zoomCoef = (opts !== undefined && opts.zoomCoef !== undefined)
-                      ? opts.zoomCoef
-                      : 1.05;
-        // zooming
+        ///////////////////////////////////////////////////////////////////////
+        // ZOOMING VARIABLES
+        // zoom = zoomCoef**zFactor
+        //
+        // store zoom as these two parts
+        // otherwise, by storing zoom, e.g. constantly mul/div by zCoef,
+        // floating point erros are introduced
+        ///////////////////////////////////////////////////////////////////////
+        // zoom coefficient
+        if (opts !== undefined && opts.zoomCoef !== undefined) {
+            this.zoomCoef = opts.zoomCoef;
+        } else {
+            this.zoomCoef = 1.05;
+        }
+        // zooming factor
         this.zFactor = 0;
-        // panning
+
+
+        ///////////////////////////////////////////////////////////////////////
+        // PANNING VARIABLES
+        // xDelta = x - xDown
+        // yDelta = y - yDown
+        ///////////////////////////////////////////////////////////////////////
+        // store the point a drag starts
         this.xDown = undefined;
         this.yDown = undefined;
-
+        // mouse position when a drag starts
         this.xDrag = undefined;
         this.yDrag = undefined;
-        // index of the current panning element
-        this.panning = -1;
+        // the element currently panning
+        this.panning = undefined;
+
+        ///////////////////////////////////////////////////////////////////////
+        // TRANSFORMATION MATRIX
+        //
+        // a transformation matrix is linear operator which can do:
+        // translations (panning)
+        // scaling (zooming)
+        // sheering (we don't want to do that)
+        // rotating (we also don't want to do that)
+        //
+        // For our purposes, since the transformation matrix looks like:
+        // [[z, 0, x],
+        //  [0, z, y],
+        //  [0, 0, z]]
+        //
+        //  we can just represent it as [x, y, z]
+        //
+        //  where z is the zoom and xt and xt are the amounts to pan
+        //
+        ///////////////////////////////////////////////////////////////////////
         // transformation matrix...well the trace of it
-        this.transformation = [0,0,this.zoomCoef**this.zFactor];
+        const z = this.zoomCoef**this.zFactor;
+        this.transformation = [0, 0, z];
         return this;
     }
 
@@ -25,7 +64,7 @@ export class Zoomer {
     }
 
     zoom(elem, x, y, zoomIn) {
-        this.transformation = this.zoomHelper(elem, x, y, zoomIn)
+        this.transformation = this.zoomHelper(elem, x, y, zoomIn);
         this.setTransformation(...this.transformation);
         return this;
     }
@@ -66,14 +105,16 @@ export class Zoomer {
         let yNew = yMouse - yNewZ;
         // keep in bounds
         [xNew, yNew] = this.keepInBounds(elem, xNew, yNew, zNew);
-        // make sure scale is to the right of traslate3d
+
         return [xNew, yNew, zNew];
     }
 
     clientPosToRelPos(elem, x, y) {
         // scroll offset
-        const xScroll = window.pageXOffset || document.documentElement.scrollLeft;
-        const yScroll = window.pageYOffset || document.documentElement.scrollTop;
+        const xScroll = window.pageXOffset ||
+                        document.documentElement.scrollLeft;
+        const yScroll = window.pageYOffset ||
+                        document.documentElement.scrollTop;
         // container offset
         const xOffset = elem.offsetLeft;
         const yOffset = elem.offsetTop;
@@ -105,18 +146,18 @@ export class Zoomer {
         return [x, y];
     }
 
-    pan(elem) {
-        this.transformation = this.panHelper(elem)
+    pan(elem, x, y) {
+        this.transformation = this.panHelper(elem, x, y);
         this.setTransformation(...this.transformation);
         return this;
     }
 
-    panHelper(elem) {
+    panHelper(elem, x, y) {
         // get old values
-        const [xOld, yOld, zOld] = this.transformation;
+        const zOld = this.transformation[2];
         // get the difference between the down and current point
-        const xDelta = this.x - this.xDown;
-        const yDelta = this.y - this.yDown;
+        const xDelta = x - this.xDown;
+        const yDelta = y - this.yDown;
         // return if no previous value
         if (xDelta === undefined || yDelta === undefined) {
             return this.transformation;
@@ -128,10 +169,10 @@ export class Zoomer {
         return [xNew, yNew, zOld];
     }
 
-    addOnScroll(callback) {
+    addZoom(callback) {
         this.elems.forEach(elem => {
             elem.onwheel = (event) => {
-                event.preventDefault();
+                event.preventDefault(); // otherwise the page scrolls
                 const x = event.clientX;
                 const y = event.clientY;
                 const zoomIn = (event.deltaY < 0) ? 1 : -1;
@@ -144,7 +185,7 @@ export class Zoomer {
         return this;
     }
 
-    addOnDrag(callback) {
+    addPan(callback) {
         this.elems.forEach((elem, i) => {
             // when the mouse goes down, start the pan
             elem.onmousedown = (event) => {
@@ -155,6 +196,7 @@ export class Zoomer {
                     elem.classList.remove("grab");
                     this.xDown = event.clientX;
                     this.yDown = event.clientY;
+                    // when a drag starts
                     this.xDrag = this.transformation[0];
                     this.yDrag = this.transformation[1];
                 }
@@ -162,13 +204,9 @@ export class Zoomer {
             // when dragged, pan
             elem.onmousemove = (event) => {
                 this.onPan(elem, event, callback);
-                this.x = event.clientX;
-                this.y = event.clientY;
             }
             window.addEventListener("mousemove", (event) => {
                 this.onPan(elem, event, callback);
-                this.x = event.clientX;
-                this.y = event.clientY;
             });
             // when mouseup, reset
             elem.onmouseup = (event) => {
@@ -200,9 +238,11 @@ export class Zoomer {
 
     onPan(elem, event, callback) {
         if (event.ctrlKey && this.panning === elem) {
-            this.pan(elem);
+            const x = event.clientX;
+            const y = event.clientY;
+            this.pan(elem, x, y);
             if (callback !== undefined) {
-                callback(this.x, this.y, this.zoomCoef**this.z);
+                callback(...this.transformation);
             }
         }
     }
@@ -231,23 +271,40 @@ export class Zoomer {
     }
 
 
-    addOnClick(callback) {
+    onClick(callback) {
         this.elems.forEach(elem => {
             elem.onclick = (event) => {
+                if (event.key === "Control") {
+                    return;
+                }
                 const x = event.clientX;
                 const y = event.clientY;
-                this.getPoint(elem, x, y);
+
+                const [xMouse, yMouse] = this.clientPosToRelPos(elem, x, y);
+                const [xt, yt, z] = this.transformation;
+                const xElement = (xMouse - xt)/z;
+                const yElement = (yMouse - yt)/z;
+                const [xReal, yReal] = this.getRealPoint(elem,
+                                                         xElement,
+                                                         yElement)
+                if (callback !== undefined) {
+                    callback(xElement, yElement, xReal, yReal)
+                }
             }
         });
     }
 
-    getPoint(elem, x, y) {
-        const [xMouse, yMouse] = this.clientPosToRelPos(elem, x, y);
-        const [xt, yt, z] = this.transformation;
-        const xElement = (xMouse - xt)/z;
-        const yElement = (yMouse - yt)/z;
-        console.log(`${xElement} ${yElement}`);
-        return [xElement, yElement];
+    getRealPoint(elem, x, y) {
+        switch (elem.tagName) {
+            case ("IMG"):
+                return [x*elem.naturalWidth/elem.clientWidth,
+                        y*elem.naturalHeight/elem.clientHeight]
+                break;
+            case ("VIDEO"):
+                return [x*elem.videoWidth/elem.clientWidth,
+                        y*elem.videoHeight/elem.clientHeight]
+            default:
+                return [x, y];
+        }
     }
-
 }

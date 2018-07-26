@@ -38,7 +38,7 @@ If you used npm, they'll be in ```node_modules/omnizoom/dist```
 1. make sure you've included the code (above)
 2. add the css class ```zoom``` to any zoomable elements
 3. add the css class ```zoom-container``` to any container around a zoomable object (this prevents the zoom from overflowing its container.
-4. include this somewhere ```(new omnizoom.Zoomer()).addElem(<your-element>).addOnScroll()```
+4. include this somewhere ```(new omnizoom.Zoomer()).addElem(<your-element>).addZoom()```
 
 # Usage
 Possible HTML elements:
@@ -60,14 +60,14 @@ How to make each element zoomable with the scroll wheel:
 // add zoom functionality to the video
 const zoomy1 = new omnizoom.Zoomer()
                            .addElem(document.getElementById("zoomable-video"))
-                           .addOnScroll();
+                           .addZoom();
 // add pan functionality to the img
 const zoomy2 = new omnizoom.Zoomer()
                            .addElem(document.getElementById("zoomable-img"))
-                           .addOnDrag();
+                           .addPan();
 // add zoom and pan functionality to the div
 const zoomy3 = new omnizoom.Zoomer()
                            .addElem(document.getElementById("zoomable-div"))
-                           .addOnScroll()
-                           .addOnDrag();
+                           .addZoom()
+                           .addPan();
 ```

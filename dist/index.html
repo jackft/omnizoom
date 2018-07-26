@@ -6,27 +6,33 @@
     <link rel="stylesheet" href="omnizoom.css">
   </head>
   <body>
-    <div class="zoom-container" style="width: 50%; margin: 10px">
-      <video id="video" style="width: 100%" class="zoom" preload="auto" src="./data/count.mp4">
-      </video>
-    </div>
-    <div class="zoom-container" style="width: 50%; margin: 10px">
-      <img id="img1" class="zoom" style="width: 100%" src="./data/IMG-0840.JPG">
-    </div>
-    <div class="zoom-container" style="width: 50%; margin: 10px">
-      <img id="img2" class="zoom" style="width: 100%" src="./data/IMG-0840.JPG">
-    </div>
-    <div class="zoom-container" style="width: 50%; margin: 10px">
-      <div id="ann" class="zoom">
-        <img style="width: 100%; top: 0px" src="./data/IMG-0840.JPG">
-        <svg style="width: 100%; height: 100%; top: 0px"></svg>
+    <div>
+      <div class="zoom-container" style="width: 50%; margin: 10px">
+        <video id="video" style="width: 100%" class="zoom" preload="auto" src="./data/count.mp4">
+        </video>
       </div>
-    </div>
-    <div id="cntr" style="width: 50%; margin: 10px" class="zoom-container">
-      <div id="chld" style="width: 100%" class="zoom">
-        <h1>The Good</h1>
-        <h2>The Bad</h2>
-        <h3>The Zoomies</h3>
+      <div class="zoom-container" style="width: 50%; margin: 10px">
+        <img id="img1" class="zoom" style="width: 100%" src="http://jackterwilliger.com/wp-content/uploads/2018/07/test_coordinates.png">
+      </div>
+      <div>
+          <p id='elem'></p>
+          <p id='real' style="float: left;"></p>
+      </div>
+      <div class="zoom-container" style="width: 50%; margin: 10px">
+        <img id="img2" class="zoom" style="width: 100%" src="http://jackterwilliger.com/wp-content/uploads/2018/07/test_coordinates.png">
+      </div>
+      <div class="zoom-container" style="width: 50%; margin: 10px">
+        <div id="ann" class="zoom">
+          <img style="width: 100%; top: 0px" src="./data/IMG-0840.JPG">
+          <svg style="width: 100%; height: 100%; top: 0px"></svg>
+        </div>
+      </div>
+      <div id="cntr" style="width: 50%; margin: 10px" class="zoom-container">
+        <div id="chld" style="width: 100%" class="zoom">
+          <h1>The Good</h1>
+          <h2>The Bad</h2>
+          <h3>The Zoomies</h3>
+        </div>
       </div>
     </div>
     <script src="omnizoom.min.js"></script>
@@ -39,26 +45,31 @@
 
     const zmy1 = new omnizoom.Zoomer();
     zmy1.addElem(video)
-        .addOnScroll()
-        .addOnDrag();
+        .addZoom()
+        .addPan();
 
     const zmy2 = new omnizoom.Zoomer();
     zmy2.addElem(chld)
-        .addOnScroll()
-        .addOnDrag();
+        .addZoom()
+        .addPan();
 
     const zmy3 = new omnizoom.Zoomer();
     zmy3.addElem(img1)
         .addElem(img2)
-        .addOnScroll()
-        .addOnDrag()
-        .addOnClick();
+        .addZoom()
+        .addPan()
+        .onClick(displayPoints);
+
+    function displayPoints(ex, ey, rx, ry) {
+        document.getElementById("elem").innerText = `client position: ${ex.toFixed(3)} ${ey.toFixed(4)}`;
+        document.getElementById("real").innerText = `pixel: ${rx.toFixed(0)} ${ry.toFixed(0)}`;
+    }
 
     const zmy4 = new omnizoom.Zoomer();
     zmy4.addElem(ann)
-        .addOnScroll()
-        .addOnDrag()
-        .addOnClick();
+        .addZoom()
+        .addPan()
+        .onClick(displayPoints);
 
     let playing = false;
     document.addEventListener("keypress", (event) => {
