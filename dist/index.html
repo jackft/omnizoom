@@ -11,7 +11,16 @@
       </video>
     </div>
     <div class="zoom-container" style="width: 50%; margin: 10px">
-      <img id="img" class="zoom" style="width: 100%" src="./data/IMG-0840.JPG">
+      <img id="img1" class="zoom" style="width: 100%" src="./data/IMG-0840.JPG">
+    </div>
+    <div class="zoom-container" style="width: 50%; margin: 10px">
+      <img id="img2" class="zoom" style="width: 100%" src="./data/IMG-0840.JPG">
+    </div>
+    <div class="zoom-container" style="width: 50%; margin: 10px">
+      <div id="ann" class="zoom">
+        <img style="width: 100%; top: 0px" src="./data/IMG-0840.JPG">
+        <svg style="width: 100%; height: 100%; top: 0px"></svg>
+      </div>
     </div>
     <div id="cntr" style="width: 50%; margin: 10px" class="zoom-container">
       <div id="chld" style="width: 100%" class="zoom">
@@ -24,7 +33,9 @@
     <script>
     const video = document.getElementById("video");
     const chld = document.getElementById("chld");
-    const img = document.getElementById("img");
+    const img1 = document.getElementById("img1");
+    const img2 = document.getElementById("img2");
+    const ann = document.getElementById("ann");
 
     const zmy1 = new omnizoom.Zoomer();
     zmy1.addElem(video)
@@ -37,9 +48,17 @@
         .addOnDrag();
 
     const zmy3 = new omnizoom.Zoomer();
-    zmy3.addElem(img)
+    zmy3.addElem(img1)
+        .addElem(img2)
         .addOnScroll()
-        .addOnDrag();
+        .addOnDrag()
+        .addOnClick();
+
+    const zmy4 = new omnizoom.Zoomer();
+    zmy4.addElem(ann)
+        .addOnScroll()
+        .addOnDrag()
+        .addOnClick();
 
     let playing = false;
     document.addEventListener("keypress", (event) => {

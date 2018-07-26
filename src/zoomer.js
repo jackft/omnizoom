@@ -7,9 +7,13 @@ export class Zoomer {
         // zooming
         this.zFactor = 0;
         // panning
+        this.xDown = undefined;
+        this.yDown = undefined;
+
         this.xDrag = undefined;
         this.yDrag = undefined;
-        this.panning = false;
+        // index of the current panning element
+        this.panning = -1;
         // transformation matrix...well the trace of it
         this.transformation = [0,0,this.zoomCoef**this.zFactor];
         return this;
@@ -101,31 +105,26 @@ export class Zoomer {
         return [x, y];
     }
 
-    pan(elem, x, y) {
-        this.transformation = this.panHelper(elem, x, y)
+    pan(elem) {
+        this.transformation = this.panHelper(elem)
         this.setTransformation(...this.transformation);
         return this;
     }
 
-    panHelper(elem, x, y) {
-        // return if no previous value
-        const [xMouse, yMouse] = this.clientPosToRelPos(elem, x, y);
-        if (!this.panning || this.xDrag == undefined || this.yDrag == undefined) {
-            this.xDrag = xMouse;
-            this.yDrag = yMouse;
-            return this.transformation;
-        }
+    panHelper(elem) {
         // get old values
         const [xOld, yOld, zOld] = this.transformation;
-        // get the difference between the current and last drag
-        const xDelta = xMouse - this.xDrag;
-        const yDelta = yMouse - this.yDrag;
+        // get the difference between the down and current point
+        const xDelta = this.x - this.xDown;
+        const yDelta = this.y - this.yDown;
+        // return if no previous value
+        if (xDelta === undefined || yDelta === undefined) {
+            return this.transformation;
+        }
         // get new translation values
-        let xNew = xOld + xDelta;
-        let yNew = yOld + yDelta;
+        let xNew = this.xDrag + xDelta;
+        let yNew = this.yDrag + yDelta;
         [xNew, yNew] = this.keepInBounds(elem, xNew, yNew, zOld);
-        this.xDrag = xMouse;
-        this.yDrag = yMouse;
         return [xNew, yNew, zOld];
     }
 
@@ -146,40 +145,53 @@ export class Zoomer {
     }
 
     addOnDrag(callback) {
-        this.elems.forEach(elem => {
+        this.elems.forEach((elem, i) => {
             // when the mouse goes down, start the pan
             elem.onmousedown = (event) => {
                 if (event.ctrlKey) {
                     event.preventDefault();
-                    this.panning = true;
+                    this.panning = elem;
+                    elem.classList.add("grabbing");
+                    elem.classList.remove("grab");
+                    this.xDown = event.clientX;
+                    this.yDown = event.clientY;
+                    this.xDrag = this.transformation[0];
+                    this.yDrag = this.transformation[1];
                 }
             }
             // when dragged, pan
             elem.onmousemove = (event) => {
                 this.onPan(elem, event, callback);
+                this.x = event.clientX;
+                this.y = event.clientY;
             }
             window.addEventListener("mousemove", (event) => {
                 this.onPan(elem, event, callback);
+                this.x = event.clientX;
+                this.y = event.clientY;
             });
             // when mouseup, reset
             elem.onmouseup = (event) => {
                 this.offPan(elem, event);
             }
             window.addEventListener("mouseup", (event) => {
-                this.panning = false;
-                this.xDrag = undefined;
-                this.yDrag = undefined;
+                this.offPan(elem, event);
             });
             // Change the cursor to a grabby hand
             // Change it back when no longer panning
             document.addEventListener("keydown", (event) => {
                 if (event.key === "Control") {
-                    elem.classList.add("grabbed");
+                    if (this.panning !== undefined) {
+                        elem.classList.add("grabbing");
+                    } else {
+                        elem.classList.add("grab");
+                    }
                 }
             });
             document.addEventListener("keyup", (event) => {
                 if (event.key === "Control") {
-                    elem.classList.remove("grabbed");
+                    elem.classList.remove("grab");
+                    elem.classList.remove("grabbing");
                 }
             });
         });
@@ -187,30 +199,22 @@ export class Zoomer {
     }
 
     onPan(elem, event, callback) {
-        if (event.ctrlKey && this.panning) {
-            const x = event.clientX;
-            const y = event.clientY;
-            if (x != 0 && y != 0 && this.panning) {
-                this.pan(elem, x, y);
-            }
+        if (event.ctrlKey && this.panning === elem) {
+            this.pan(elem);
             if (callback !== undefined) {
                 callback(this.x, this.y, this.zoomCoef**this.z);
             }
-        } else {
-            this.xDrag = undefined;
-            this.yDrag = undefined;
-            this.panning = false;
         }
     }
 
     offPan(elem, event) {
-        this.xDrag = undefined;
-        this.yDrag = undefined;
-        this.panning = false;
-    }
-
-    getTransformation() {
-        return [this.x, this.y, this.zoomCoef**this.z];
+        elem.classList.remove("grabbing");
+        if (this.panning !== undefined) {
+            elem.classList.add("grab");
+        }
+        this.xDown = undefined;
+        this.yDown = undefined;
+        this.panning = undefined;
     }
 
     setTransformation(x, y, z) {
@@ -225,4 +229,25 @@ export class Zoomer {
         elem.style.setProperty('transform', transformation);
         return this;
     }
+
+
+    addOnClick(callback) {
+        this.elems.forEach(elem => {
+            elem.onclick = (event) => {
+                const x = event.clientX;
+                const y = event.clientY;
+                this.getPoint(elem, x, y);
+            }
+        });
+    }
+
+    getPoint(elem, x, y) {
+        const [xMouse, yMouse] = this.clientPosToRelPos(elem, x, y);
+        const [xt, yt, z] = this.transformation;
+        const xElement = (xMouse - xt)/z;
+        const yElement = (yMouse - yt)/z;
+        console.log(`${xElement} ${yElement}`);
+        return [xElement, yElement];
+    }
+
 }

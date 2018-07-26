@@ -22,9 +22,12 @@
 
 
 /* cue users that they are in grab mode */
-.grabbed {
+.grabbing {
+    cursor: -webkit-grabbing;
     cursor: grabbing;
-    cursor: hand;
+}
+
+.grab {
     cursor: -webkit-grab;
     cursor: grab;
 }
