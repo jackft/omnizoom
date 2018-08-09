@@ -178,7 +178,7 @@ export class Zoomer {
                 const zoomIn = (event.deltaY < 0) ? 1 : -1;
                 this.zoom(elem, x, y, zoomIn);
                 if (callback !== undefined) {
-                    callback(...this.transformation);
+                    callback(this.transformation[0], this.transformation[1], this.transformation[2]);
                 }
             }
     
@@ -243,7 +243,7 @@ export class Zoomer {
             const y = event.clientY;
             this.pan(elem, x, y);
             if (callback !== undefined) {
-                callback(...this.transformation);
+                callback(this.transformation[0], this.transformation[1], this.transformation[2]);
             }
         }
     }
