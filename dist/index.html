@@ -56,7 +56,7 @@
     const zmy3 = new omnizoom.Zoomer();
     zmy3.addElem(img1)
         .addElem(img2)
-        .addZoom()
+        .addZoom(() => console.log('hi'))
         .addPan()
         .onClick(displayPoints);
 

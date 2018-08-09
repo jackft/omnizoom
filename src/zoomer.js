@@ -178,7 +178,7 @@ export class Zoomer {
                 const zoomIn = (event.deltaY < 0) ? 1 : -1;
                 this.zoom(elem, x, y, zoomIn);
                 if (callback !== undefined) {
-                    callback(this.x, this.y, this.zoomCoef**this.z);
+                    callback(...this.transformation);
                 }
             }
     
